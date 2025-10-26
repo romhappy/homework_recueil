@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formation Médico-Sociale - Auto-formation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .progress-container {
+            background: white;
+            padding: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e67e22 0%, #d35400 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section h2 {
+            color: #e67e22;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .section p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .video-container {
+            margin: 30px 0;
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .video-placeholder {
+            background: #000;
+            color: white;
+            padding: 100px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .video-watched {
+            display: none;
+            color: #4caf50;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(230, 126, 34, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .qcm-container {
+            margin: 30px 0;
+        }
+
+        .question {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #e67e22;
+        }
+
+        .question h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .answer {
+            padding: 15px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .answer:hover {
+            border-color: #e67e22;
+            background: #fff5f0;
+        }
+
+        .answer.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .answer.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .answer.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .qcm-feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .qcm-feedback.show {
+            display: block;
+        }
+
+        .qcm-feedback.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .qcm-feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        /* === CARTES FLIP === */
+        .flip-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .flip-card-front {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .flip-card-back {
+            background: white;
+            color: #333;
+            transform: rotateY(180deg);
+            border: 2px solid #e67e22;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .flip-instructions {
+            background: #fff5f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #e67e22;
+            font-style: italic;
+        }
+
+        .flip-complete-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .flip-complete-message.show {
+            display: block;
+        }
+
+        /* === DRAG AND DROP === */
+        .drag-drop-container {
+            margin: 30px 0;
+        }
+
+        .drag-instructions {
+            background: #fff5f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #e67e22;
+            font-style: italic;
+        }
+
+        .draggable-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 80px;
+        }
+
+        .draggable-item {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #e67e22;
+            border-radius: 8px;
+            cursor: move;
+            user-select: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .draggable-item:hover {
+            background: #fff5f0;
+            transform: scale(1.05);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .drop-zone {
+            padding: 15px;
+            background: white;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            min-height: 60px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .drop-zone.drag-over {
+            background: #fff5f0;
+            border-color: #e67e22;
+            border-style: solid;
+        }
+
+        .drop-zone.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .drop-zone.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.5s;
+        }
+
+        .drop-zone-label {
+            font-weight: bold;
+            color: #666;
+            min-width: 40px;
+        }
+
+        .drop-zone.correct .drop-zone-label {
+            color: #28a745;
+        }
+
+        .drop-zone.incorrect .drop-zone-label {
+            color: #dc3545;
+        }
+
+        .drag-feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .drag-feedback.show {
+            display: block;
+        }
+
+        .drag-feedback.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .drag-feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .check-order-btn {
+            margin-top: 20px;
+        }
+
+        /* Pyramide de Maslow */
+        .maslow-container {
+            margin: 30px 0;
+        }
+
+        .pyramid {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        .pyramid-level {
+            position: relative;
+            margin: 5px auto;
+            border: 2px solid #e67e22;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+            transition: all 0.3s;
+            border-radius: 5px;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .pyramid-level-1 { width: 90%; }
+        .pyramid-level-2 { width: 75%; }
+        .pyramid-level-3 { width: 60%; }
+        .pyramid-level-4 { width: 45%; }
+        .pyramid-level-5 { width: 30%; }
+
+        .pyramid-level.drag-over {
+            background: #fff5f0;
+            border-width: 3px;
+        }
+
+        .pyramid-level.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .pyramid-level.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .pyramid-label {
+            font-weight: bold;
+            color: #666;
+            margin-right: 10px;
+        }
+
+        .pyramid-level.correct .pyramid-label {
+            color: #28a745;
+        }
+
+        .pyramid-level.incorrect .pyramid-label {
+            color: #dc3545;
+        }
+
+        /* Badge */
+        .badge-container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            padding: 40px;
+            border-radius: 50%;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
+            margin-bottom: 20px;
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .badge-icon {
+            font-size: 80px;
+        }
+
+        .badge-info {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .badge-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e67e22;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px dashed #e67e22;
+        }
+
+        .verification-info {
+            background: #fff5f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 5px solid #e67e22;
+        }
+
+        .task-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .task-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .task-item.completed {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #e67e22;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .task-item.completed .task-checkbox {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .navigation, .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Formation Médico-Sociale</h1>
+            <p>Parcours d'auto-formation interactif</p>
+        </header>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">0%</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Section 1: Introduction -->
+            <div class="section active" id="section1">
+                <h2>📚 Introduction au secteur médico-social</h2>
+                <p>Bienvenue dans ce parcours d'auto-formation dédié au secteur médico-social. Ce module vous permettra d'acquérir les connaissances fondamentales nécessaires à votre pratique professionnelle.</p>
+                
+                <p><strong>Objectifs de cette formation :</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 20px; line-height: 1.8;">
+                    <li>Comprendre les fondamentaux du secteur médico-social</li>
+                    <li>Maîtriser les concepts clés de l'accompagnement</li>
+                    <li>Développer vos compétences professionnelles</li>
+                    <li>Valider vos acquis par des exercices pratiques</li>
+                </ul>
+
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        🎥 Vidéo d'introduction (Remplacer par votre vidéo YouTube/Vimeo)
+                        <br><br>
+                        <small>Pour intégrer une vraie vidéo, utilisez une iframe YouTube ou Vimeo</small>
+                    </div>
+                    <button class="btn" onclick="markVideoWatched(1)">✓ J'ai visionné la vidéo</button>
+                    <div class="video-watched" id="video1-watched">✓ Vidéo visionnée</div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn" disabled>← Précédent</button>
+                    <button class="btn" id="next1" onclick="goToSection(2)" disabled>Suivant →</button>
+                </div>
+            </div>
+
+            <!-- Section 2: Contenu théorique -->
+            <div class="section" id="section2">
+                <h2>📖 Les principes fondamentaux</h2>
+                <p>Le secteur médico-social repose sur plusieurs principes essentiels qui guident l'accompagnement des personnes en situation de vulnérabilité.</p>
+
+                <h3 style="color: #d35400; margin-top: 30px; margin-bottom: 15px;">1. Le respect de la dignité</h3>
+                <p>Chaque personne, quelles que soient ses difficultés, doit être traitée avec respect et dignité. Cela implique de reconnaître sa valeur intrinsèque en tant qu'être humain.</p>
+
+                <h3 style="color: #d35400; margin-top: 30px; margin-bottom: 15px;">2. L'autodétermination</h3>
+                <p>Il est crucial de respecter les choix et décisions de la personne accompagnée, dans la mesure du possible, afin de préserver son autonomie.</p>
+
+                <h3 style="color: #d35400; margin-top: 30px; margin-bottom: 15px;">3. La bientraitance</h3>
+                <p>La bientraitance est une culture inspirant les actions individuelles et les relations collectives au sein d'un établissement ou d'un service.</p>
+
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        🎥 Vidéo explicative sur la bientraitance
+                    </div>
+                    <button class="btn" onclick="markVideoWatched(2)">✓ J'ai visionné la vidéo</button>
+                    <div class="video-watched" id="video2-watched">✓ Vidéo visionnée</div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn" onclick="goToSection(1)">← Précédent</button>
+                    <button class="btn" id="next2" onclick="goToSection(3)" disabled>Suivant →</button>
+                </div>
+            </div>
+
+            <!-- Section 3: QCM 1 -->
+            <div class="section" id="section3">
+                <h2>✏️ Quiz de compréhension - Partie 1</h2>
+                <p>Testez vos connaissances sur les principes fondamentaux du secteur médico-social.</p>
+
+                <div class="qcm-container">
+                    <div class="question">
+                        <h3>Question 1 : Qu'est-ce que la bientraitance ?</h3>
+                        <div class="answers">
+                            <div class="answer" onclick="checkAnswer(1, 1, false)">
+                                Une obligation légale uniquement
+                            </div>
+                            <div class="answer" onclick="checkAnswer(1, 2, true)">
+                                Une culture inspirant les actions individuelles et collectives
+                            </div>
+                            <div class="answer" onclick="checkAnswer(1, 3, false)">
+                                Un protocole médical strict
+                            </div>
+                            <div class="answer" onclick="checkAnswer(1, 4, false)">
+                                Une formation obligatoire annuelle
+                            </div>
+                        </div>
+                        <div class="qcm-feedback" id="feedback1"></div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 2 : Pourquoi l'autodétermination est-elle importante ?</h3>
+                        <div class="answers">
+                            <div class="answer" onclick="checkAnswer(2, 1, false)">
+                                Pour réduire la charge de travail du personnel
+                            </div>
+                            <div class="answer" onclick="checkAnswer(2, 2, true)">
+                                Pour préserver l'autonomie et respecter les choix de la personne
+                            </div>
+                            <div class="answer" onclick="checkAnswer(2, 3, false)">
+                                Parce que c'est inscrit dans le règlement intérieur
+                            </div>
+                            <div class="answer" onclick="checkAnswer(2, 4, false)">
+                                Pour éviter les conflits avec les familles
+                            </div>
+                        </div>
+                        <div class="qcm-feedback" id="feedback2"></div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 3 : Le respect de la dignité signifie :</h3>
+                        <div class="answers">
+                            <div class="answer" onclick="checkAnswer(3, 1, false)">
+                                Traiter tous les résidents de la même manière
+                            </div>
+                            <div class="answer" onclick="checkAnswer(3, 2, false)">
+                                Appliquer strictement les protocoles établis
+                            </div>
+                            <div class="answer" onclick="checkAnswer(3, 3, true)">
+                                Reconnaître la valeur intrinsèque de chaque personne
+                            </div>
+                            <div class="answer" onclick="checkAnswer(3, 4, false)">
+                                Respecter uniquement les horaires de visite
+                            </div>
+                        </div>
+                        <div class="qcm-feedback" id="feedback3"></div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn" onclick="goToSection(2)">← Précédent</button>
+                    <button class="btn" id="next3" onclick="goToSection(4)" disabled>Suivant →</button>
+                </div>
+            </div>
+
+            <!-- Section 4: Cartes flip - Définitions -->
+            <div class="section" id="section4">
+                <h2>🔄 Découvrez les définitions clés</h2>
+                <p>Cliquez sur chaque carte pour découvrir sa définition. Vous devez retourner toutes les cartes pour continuer.</p>
+                
+                <div class="flip-instructions">
+                    💡 <strong>Instructions :</strong> Cliquez sur chaque vignette pour la retourner et découvrir sa définition.
+                </div>
+
+                <div class="flip-cards-container">
+                    <div class="flip-card" onclick="flipCard(this, 1)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <p>Bientraitance</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <p>Culture visant à promouvoir le bien-être et le respect de la personne dans tous les actes de soin et d'accompagnement.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card" onclick="flipCard(this, 2)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <p>Autonomie</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <p>Capacité d'une personne à se gouverner elle-même, à faire ses propres choix et à décider de sa vie.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card" onclick="flipCard(this, 3)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <p>Empathie</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <p>Capacité à comprendre et partager les sentiments d'autrui, à se mettre à la place de l'autre.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card" onclick="flipCard(this, 4)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <p>Accompagnement</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <p>Action de soutenir une personne dans son parcours de vie, en respectant son rythme et ses choix.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card" onclick="flipCard(this, 5)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <p>Projet personnalisé</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <p>Plan d'accompagnement élaboré avec et pour la personne, tenant compte de ses besoins et aspirations.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card" onclick="flipCard(this, 6)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <p>Secret professionnel</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <p>Obligation légale de ne pas divulguer les informations confidentielles concernant les personnes accompagnées.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-complete-message" id="flipCompleteMessage">
+                    ✓ Bravo ! Vous avez découvert toutes les définitions. Vous pouvez continuer.
+                </div>
+
+                <div class="navigation">
+                    <button class="btn" onclick="goToSection(3)">← Précédent</button>
+                    <button class="btn" id="next4" onclick="goToSection(5)" disabled>Suivant →</button>
+                </div>
+            </div>
+
+            <!-- Section 5: Drag & Drop - 14 besoins de Virginia Henderson -->
+            <div class="section" id="section5">
+                <h2>📋 Les 14 besoins fondamentaux de Virginia Henderson</h2>
+                <p>Glissez-déposez les 14 besoins dans le bon ordre (de 1 à 14).</p>
+                
+                <div class="drag-instructions">
+                    💡 <strong>Instructions :</strong> Faites glisser chaque besoin vers la case correspondant à son numéro dans la liste de Virginia Henderson.
+                </div>
+
+                <div class="drag-drop-container">
+                    <div class="draggable-items" id="hendersonItems">
+                        <div class="draggable-item" draggable="true" data-correct="1">Respirer</div>
+                        <div class="draggable-item" draggable="true" data-correct="2">Boire et manger</div>
+                        <div class="draggable-item" draggable="true" data-correct="3">Éliminer</div>
+                        <div class="draggable-item" draggable="true" data-correct="4">Se mouvoir et maintenir une bonne posture</div>
+                        <div class="draggable-item" draggable="true" data-correct="5">Dormir, se reposer</div>
+                        <div class="draggable-item" draggable="true" data-correct="6">Se vêtir et se dévêtir</div>
+                        <div class="draggable-item" draggable="true" data-correct="7">Maintenir la température du corps</div>
+                        <div class="draggable-item" draggable="true" data-correct="8">Être propre, soigné et protéger ses téguments</div>
+                        <div class="draggable-item" draggable="true" data-correct="9">Éviter les dangers</div>
+                        <div class="draggable-item" draggable="true" data-correct="10">Communiquer avec ses semblables</div>
+                        <div class="draggable-item" draggable="true" data-correct="11">Agir selon ses croyances et ses valeurs</div>
+                        <div class="draggable-item" draggable="true" data-correct="12">S'occuper en vue de se réaliser</div>
+                        <div class="draggable-item" draggable="true" data-correct="13">Se récréer</div>
+                        <div class="draggable-item" draggable="true" data-correct="14">Apprendre</div>
+                    </div>
+
+                    <div id="hendersonDropZones">
+                        <div class="drop-zone" data-position="1"><span class="drop-zone-label">1.</span></div>
+                        <div class="drop-zone" data-position="2"><span class="drop-zone-label">2.</span></div>
+                        <div class="drop-zone" data-position="3"><span class="drop-zone-label">3.</span></div>
+                        <div class="drop-zone" data-position="4"><span class="drop-zone-label">4.</span></div>
+                        <div class="drop-zone" data-position="5"><span class="drop-zone-label">5.</span></div>
+                        <div class="drop-zone" data-position="6"><span class="drop-zone-label">6.</span></div>
+                        <div class="drop-zone" data-position="7"><span class="drop-zone-label">7.</span></div>
+                        <div class="drop-zone" data-position="8"><span class="drop-zone-label">8.</span></div>
+                        <div class="drop-zone" data-position="9"><span class="drop-zone-label">9.</span></div>
+                        <div class="drop-zone" data-position="10"><span class="drop-zone-label">10.</span></div>
+                        <div class="drop-zone" data-position="11"><span class="drop-zone-label">11.</span></div>
+                        <div class="drop-zone" data-position="12"><span class="drop-zone-label">12.</span></div>
+                        <div class="drop-zone" data-position="13"><span class="drop-zone-label">13.</span></div>
+                        <div class="drop-zone" data-position="14"><span class="drop-zone-label">14.</span></div>
+                    </div>
+
+                    <button class="btn check-order-btn" onclick="checkHendersonOrder()">Vérifier l'ordre</button>
+                    <div class="drag-feedback" id="hendersonFeedback"></div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn" onclick="goToSection(4)">← Précédent</button>
+                    <button class="btn" id="next5" onclick="goToSection(6)" disabled>Suivant →</button>
+                </div>
+            </div>
+
+            <!-- Section 6: Drag & Drop - Pyramide de Maslow -->
+            <div class="section" id="section6">
+                <h2>🔺 La pyramide des besoins de Maslow</h2>
+                <p>Placez les différents besoins au bon niveau de la pyramide (de la base au sommet).</p>
+                
+                <div class="drag-instructions">
+                    💡 <strong>Instructions :</strong> Glissez chaque type de besoin vers le niveau correspondant de la pyramide.
+                </div>
+
+                <div class="maslow-container">
+                    <div class="draggable-items" id="maslowItems">
+                        <div class="draggable-item" draggable="true" data-level="1">Besoins physiologiques</div>
+                        <div class="draggable-item" draggable="true" data-level="2">Besoins de sécurité</div>
+                        <div class="draggable-item" draggable="true" data-level="3">Besoins d'appartenance et d'amour</div>
+                        <div class="draggable-item" draggable="true" data-level="4">Besoins d'estime</div>
+                        <div class="draggable-item" draggable="true" data-level="5">Besoins d'accomplissement de soi</div>
+                    </div>
+
+                    <div class="pyramid">
+                        <div class="pyramid-level pyramid-level-5" data-level="5">
+                            <span class="pyramid-label">Niveau 5:</span>
+                        </div>
+                        <div class="pyramid-level pyramid-level-4" data-level="4">
+                            <span class="pyramid-label">Niveau 4:</span>
+                        </div>
+                        <div class="pyramid-level pyramid-level-3" data-level="3">
+                            <span class="pyramid-label">Niveau 3:</span>
+                        </div>
+                        <div class="pyramid-level pyramid-level-2" data-level="2">
+                            <span class="pyramid-label">Niveau 2:</span>
+                        </div>
+                        <div class="pyramid-level pyramid-level-1" data-level="1">
+                            <span class="pyramid-label">Niveau 1:</span>
+                        </div>
+                    </div>
+
+                    <button class="btn check-order-btn" onclick="checkMaslowOrder()">Vérifier le placement</button>
+                    <div class="drag-feedback" id="maslowFeedback"></div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn" onclick="goToSection(5)">← Précédent</button>
+                    <button class="btn" id="next6" onclick="goToSection(7)" disabled>Suivant →</button>
+                </div>
+            </div>
+
+            <!-- Section 7: Mise en pratique professionnelle -->
+            <div class="section" id="section7">
+                <h2>🎯 Mise en pratique professionnelle</h2>
+                <p>Maintenant que vous maîtrisez les principes fondamentaux, voyons comment les appliquer concrètement dans votre pratique quotidienne.</p>
+
+                <h3 style="color: #d35400; margin-top: 30px; margin-bottom: 15px;">Situations pratiques</h3>
+                <p>Dans votre quotidien professionnel, vous serez confronté(e) à diverses situations nécessitant l'application de ces principes :</p>
+
+                <ul style="margin-left: 20px; margin-bottom: 20px; line-height: 1.8;">
+                    <li><strong>L'accueil :</strong> Première étape cruciale de la relation d'accompagnement</li>
+                    <li><strong>L'écoute active :</strong> Comprendre les besoins exprimés et non-exprimés</li>
+                    <li><strong>L'adaptation :</strong> Personnaliser l'accompagnement selon chaque situation</li>
+                    <li><strong>Le travail d'équipe :</strong> Collaborer efficacement avec les autres professionnels</li>
+                </ul>
+
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        🎥 Vidéo - Études de cas pratiques
+                    </div>
+                    <button class="btn" onclick="markVideoWatched(3)">✓ J'ai visionné la vidéo</button>
+                    <div class="video-watched" id="video3-watched">✓ Vidéo visionnée</div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn" onclick="goToSection(6)">← Précédent</button>
+                    <button class="btn" id="next7" onclick="goToSection(8)" disabled>Suivant →</button>
+                </div>
+            </div>
+
+            <!-- Section 8: QCM Final -->
+            <div class="section" id="section8">
+                <h2>🏆 Quiz final de validation</h2>
+                <p>Ce quiz final validera l'ensemble de vos acquis. Vous devez répondre correctement à toutes les questions pour obtenir votre badge.</p>
+
+                <div class="qcm-container">
+                    <div class="question">
+                        <h3>Question 1 : Dans une situation d'accompagnement, la priorité est :</h3>
+                        <div class="answers">
+                            <div class="answer" onclick="checkAnswer(4, 1, false)">
+                                De suivre strictement le planning établi
+                            </div>
+                            <div class="answer" onclick="checkAnswer(4, 2, true)">
+                                De s'adapter aux besoins de la personne accompagnée
+                            </div>
+                            <div class="answer" onclick="checkAnswer(4, 3, false)">
+                                De minimiser le temps d'intervention
+                            </div>
+                            <div class="answer" onclick="checkAnswer(4, 4, false)">
+                                D'éviter tout conflit
+                            </div>
+                        </div>
+                        <div class="qcm-feedback" id="feedback4"></div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 2 : L'écoute active implique :</h3>
+                        <div class="answers">
+                            <div class="answer" onclick="checkAnswer(5, 1, false)">
+                                D'attendre son tour pour parler
+                            </div>
+                            <div class="answer" onclick="checkAnswer(5, 2, false)">
+                                De donner rapidement son avis
+                            </div>
+                            <div class="answer" onclick="checkAnswer(5, 3, true)">
+                                De comprendre les besoins exprimés et non-exprimés
+                            </div>
+                            <div class="answer" onclick="checkAnswer(5, 4, false)">
+                                De prendre des notes pendant l'entretien
+                            </div>
+                        </div>
+                        <div class="qcm-feedback" id="feedback5"></div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 3 : Le travail en équipe dans le secteur médico-social requiert :</h3>
+                        <div class="answers">
+                            <div class="answer" onclick="checkAnswer(6, 1, false)">
+                                De travailler de manière indépendante
+                            </div>
+                            <div class="answer" onclick="checkAnswer(6, 2, true)">
+                                Une collaboration efficace entre professionnels
+                            </div>
+                            <div class="answer" onclick="checkAnswer(6, 3, false)">
+                                De suivre uniquement les directives du responsable
+                            </div>
+                            <div class="answer" onclick="checkAnswer(6, 4, false)">
+                                D'éviter les réunions pour gagner du temps
+                            </div>
+                        </div>
+                        <div class="qcm-feedback" id="feedback6"></div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn" onclick="goToSection(7)">← Précédent</button>
+                    <button class="btn" id="next8" onclick="goToSection(9)" disabled>Obtenir mon badge →</button>
+                </div>
+            </div>
+
+            <!-- Section 9: Badge de réussite -->
+            <div class="section" id="section9">
+                <div class="badge-container">
+                    <div class="badge">
+                        <div class="badge-icon">🏅</div>
+                    </div>
+                    <h2>Félicitations !</h2>
+                    <p style="font-size: 1.2em; margin: 20px 0;">Vous avez terminé avec succès le parcours de formation</p>
+                    
+                    <div class="badge-info">
+                        <h3>Votre Badge de Certification</h3>
+                        <div class="badge-code" id="badgeCode">Chargement...</div>
+                        
+                        <p><strong>Informations du badge :</strong></p>
+                        <ul style="list-style: none; margin: 20px 0;">
+                            <li>📅 Date d'obtention : <span id="completionDate"></span></li>
+                            <li>⏰ Heure : <span id="completionTime"></span></li>
+                            <li>🔒 Code unique et vérifiable</li>
+                        </ul>
+
+                        <div class="verification-info">
+                            <h4>ℹ️ Pour le formateur</h4>
+                            <p><strong>Vérification du badge :</strong></p>
+                            <p>Le code ci-dessus contient :</p>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>Un identifiant unique généré aléatoirement</li>
+                                <li>La date et l'heure de complétion</li>
+                                <li>Un hash de vérification</li>
+                            </ul>
+                            <p style="margin-top: 15px;"><small>Note : Chaque badge est unique. Demandez à l'étudiant de vous montrer cette page ou de faire une capture d'écran incluant le code complet.</small></p>
+                        </div>
+
+                        <button class="btn" onclick="window.print()" style="margin-top: 20px;">🖨️ Imprimer mon badge</button>
+                        <button class="btn" onclick="downloadBadge()" style="margin-top: 20px;">💾 Télécharger l'attestation</button>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3>Récapitulatif de votre parcours</h3>
+                        <ul class="task-list">
+                            <li class="task-item completed">
+                                <div class="task-checkbox">✓</div>
+                                <div>Introduction et objectifs</div>
+                            </li>
+                            <li class="task-item completed">
+                                <div class="task-checkbox">✓</div>
+                                <div>Principes fondamentaux</div>
+                            </li>
+                            <li class="task-item completed">
+                                <div class="task-checkbox">✓</div>
+                                <div>Quiz de compréhension</div>
+                            </li>
+                            <li class="task-item completed">
+                                <div class="task-checkbox">✓</div>
+                                <div>Découverte des définitions clés</div>
+                            </li>
+                            <li class="task-item completed">
+                                <div class="task-checkbox">✓</div>
+                                <div>14 besoins de Virginia Henderson</div>
+                            </li>
+                            <li class="task-item completed">
+                                <div class="task-checkbox">✓</div>
+                                <div>Pyramide de Maslow</div>
+                            </li>
+                            <li class="task-item completed">
+                                <div class="task-checkbox">✓</div>
+                                <div>Mise en pratique</div>
+                            </li>
+                            <li class="task-item completed">
+                                <div class="task-checkbox">✓</div>
+                                <div>Quiz final validé</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // État de la progression
+        const state = {
+            currentSection: 1,
+            videosWatched: [false, false, false],
+            qcmAnswered: [false, false, false, false, false, false],
+            qcmCorrect: [false, false, false, false, false, false],
+            cardsFlipped: [false, false, false, false, false, false],
+            hendersonComplete: false,
+            maslowComplete: false,
+            totalSections: 9
+        };
+
+        // Fonction pour marquer une vidéo comme visionnée
+        function markVideoWatched(videoNumber) {
+            state.videosWatched[videoNumber - 1] = true;
+            document.getElementById(`video${videoNumber}-watched`).style.display = 'block';
+            checkSectionCompletion(state.currentSection);
+            updateProgress();
+        }
+
+        // Fonction pour vérifier la complétion d'une section
+        function checkSectionCompletion(section) {
+            let canProceed = false;
+
+            switch(section) {
+                case 1:
+                    canProceed = state.videosWatched[0];
+                    document.getElementById('next1').disabled = !canProceed;
+                    break;
+                case 2:
+                    canProceed = state.videosWatched[1];
+                    document.getElementById('next2').disabled = !canProceed;
+                    break;
+                case 3:
+                    canProceed = state.qcmCorrect[0] && state.qcmCorrect[1] && state.qcmCorrect[2];
+                    document.getElementById('next3').disabled = !canProceed;
+                    break;
+                case 4:
+                    canProceed = state.cardsFlipped.every(card => card === true);
+                    document.getElementById('next4').disabled = !canProceed;
+                    break;
+                case 5:
+                    canProceed = state.hendersonComplete;
+                    document.getElementById('next5').disabled = !canProceed;
+                    break;
+                case 6:
+                    canProceed = state.maslowComplete;
+                    document.getElementById('next6').disabled = !canProceed;
+                    break;
+                case 7:
+                    canProceed = state.videosWatched[2];
+                    document.getElementById('next7').disabled = !canProceed;
+                    break;
+                case 8:
+                    canProceed = state.qcmCorrect[3] && state.qcmCorrect[4] && state.qcmCorrect[5];
+                    document.getElementById('next8').disabled = !canProceed;
+                    break;
+            }
+        }
+
+        // Fonction pour vérifier une réponse QCM
+        function checkAnswer(questionNumber, answerNumber, isCorrect) {
+            const questionIndex = questionNumber - 1;
+            
+            // Si déjà répondu correctement, ignorer
+            if (state.qcmCorrect[questionIndex]) {
+                return;
+            }
+
+            const questions = document.querySelectorAll('.question');
+            const question = questions[questionIndex];
+            const answers = question.querySelectorAll('.answer');
+            const feedback = document.getElementById(`feedback${questionNumber}`);
+
+            // Désactiver tous les boutons de réponse
+            answers.forEach(answer => {
+                answer.classList.add('disabled');
+            });
+
+            // Marquer la réponse sélectionnée
+            const selectedAnswer = answers[answerNumber - 1];
+            
+            if (isCorrect) {
+                selectedAnswer.classList.add('correct');
+                feedback.textContent = '✓ Bonne réponse ! Vous pouvez continuer.';
+                feedback.className = 'qcm-feedback show success';
+                state.qcmCorrect[questionIndex] = true;
+            } else {
+                selectedAnswer.classList.add('incorrect');
+                feedback.textContent = '✗ Réponse incorrecte. Réessayez en cliquant sur une autre réponse.';
+                feedback.className = 'qcm-feedback show error';
+                
+                // Réactiver les boutons après 1 seconde
+                setTimeout(() => {
+                    answers.forEach(answer => {
+                        if (!answer.classList.contains('incorrect')) {
+                            answer.classList.remove('disabled');
+                        }
+                    });
+                }, 1000);
+            }
+
+            state.qcmAnswered[questionIndex] = true;
+            checkSectionCompletion(state.currentSection);
+            updateProgress();
+        }
+
+        // Fonction pour retourner une carte
+        function flipCard(card, cardNumber) {
+            if (!card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+                state.cardsFlipped[cardNumber - 1] = true;
+                
+                // Vérifier si toutes les cartes sont retournées
+                if (state.cardsFlipped.every(c => c === true)) {
+                    document.getElementById('flipCompleteMessage').classList.add('show');
+                    checkSectionCompletion(4);
+                }
+                updateProgress();
+            }
+        }
+
+        // Drag and Drop - Henderson
+        let draggedElement = null;
+
+        // Initialiser le drag and drop pour Henderson
+        function initHendersonDragDrop() {
+            const items = document.querySelectorAll('#hendersonItems .draggable-item');
+            const zones = document.querySelectorAll('#hendersonDropZones .drop-zone');
+
+            items.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            zones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            this.classList.add('drag-over');
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            this.classList.remove('drag-over');
+
+            if (draggedElement) {
+                // Retirer l'élément de son conteneur actuel
+                const parent = draggedElement.parentNode;
+                
+                // Ajouter à la zone de dépôt
+                this.appendChild(draggedElement);
+                
+                draggedElement = null;
+            }
+
+            return false;
+        }
+
+        // Vérifier l'ordre de Henderson
+        function checkHendersonOrder() {
+            const zones = document.querySelectorAll('#hendersonDropZones .drop-zone');
+            const feedback = document.getElementById('hendersonFeedback');
+            let allCorrect = true;
+
+            zones.forEach(zone => {
+                const position = parseInt(zone.getAttribute('data-position'));
+                const item = zone.querySelector('.draggable-item');
+                
+                zone.classList.remove('correct', 'incorrect');
+                
+                if (item) {
+                    const correctPosition = parseInt(item.getAttribute('data-correct'));
+                    if (correctPosition === position) {
+                        zone.classList.add('correct');
+                    } else {
+                        zone.classList.add('incorrect');
+                        allCorrect = false;
+                    }
+                } else {
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                feedback.textContent = '✓ Parfait ! Tous les besoins sont dans le bon ordre. Vous pouvez continuer.';
+                feedback.className = 'drag-feedback show success';
+                state.hendersonComplete = true;
+                checkSectionCompletion(5);
+                updateProgress();
+            } else {
+                feedback.textContent = '✗ Certains besoins ne sont pas au bon endroit. Réessayez !';
+                feedback.className = 'drag-feedback show error';
+                
+                // Réinitialiser après 2 secondes
+                setTimeout(() => {
+                    zones.forEach(zone => {
+                        zone.classList.remove('correct', 'incorrect');
+                        const item = zone.querySelector('.draggable-item');
+                        if (item) {
+                            document.getElementById('hendersonItems').appendChild(item);
+                        }
+                    });
+                    feedback.classList.remove('show');
+                }, 2000);
+            }
+        }
+
+        // Drag and Drop - Maslow
+        function initMaslowDragDrop() {
+            const items = document.querySelectorAll('#maslowItems .draggable-item');
+            const levels = document.querySelectorAll('.pyramid-level');
+
+            items.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            levels.forEach(level => {
+                level.addEventListener('dragover', handleDragOver);
+                level.addEventListener('drop', handleDrop);
+                level.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        // Vérifier le placement Maslow
+        function checkMaslowOrder() {
+            const levels = document.querySelectorAll('.pyramid-level');
+            const feedback = document.getElementById('maslowFeedback');
+            let allCorrect = true;
+
+            levels.forEach(level => {
+                const levelNumber = parseInt(level.getAttribute('data-level'));
+                const item = level.querySelector('.draggable-item');
+                
+                level.classList.remove('correct', 'incorrect');
+                
+                if (item) {
+                    const correctLevel = parseInt(item.getAttribute('data-level'));
+                    if (correctLevel === levelNumber) {
+                        level.classList.add('correct');
+                    } else {
+                        level.classList.add('incorrect');
+                        allCorrect = false;
+                    }
+                } else {
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                feedback.textContent = '✓ Excellent ! Tous les besoins sont correctement placés sur la pyramide. Vous pouvez continuer.';
+                feedback.className = 'drag-feedback show success';
+                state.maslowComplete = true;
+                checkSectionCompletion(6);
+                updateProgress();
+            } else {
+                feedback.textContent = '✗ Certains besoins ne sont pas au bon niveau. Réessayez !';
+                feedback.className = 'drag-feedback show error';
+                
+                // Réinitialiser après 2 secondes
+                setTimeout(() => {
+                    levels.forEach(level => {
+                        level.classList.remove('correct', 'incorrect');
+                        const item = level.querySelector('.draggable-item');
+                        if (item) {
+                            document.getElementById('maslowItems').appendChild(item);
+                        }
+                    });
+                    feedback.classList.remove('show');
+                }, 2000);
+            }
+        }
+
+        // Fonction pour naviguer entre les sections
+        function goToSection(sectionNumber) {
+            // Cacher toutes les sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Afficher la section demandée
+            document.getElementById(`section${sectionNumber}`).classList.add('active');
+            state.currentSection = sectionNumber;
+
+            // Initialiser le drag & drop si nécessaire
+            if (sectionNumber === 5) {
+                setTimeout(initHendersonDragDrop, 100);
+            } else if (sectionNumber === 6) {
+                setTimeout(initMaslowDragDrop, 100);
+            }
+
+            // Générer le badge si on arrive à la dernière section
+            if (sectionNumber === 9) {
+                generateBadge();
+            }
+
+            // Scroller vers le haut
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            updateProgress();
+        }
+
+        // Fonction pour mettre à jour la barre de progression
+        function updateProgress() {
+            let progress = 0;
+            
+            // Vidéos : 20%
+            const videosCompleted = state.videosWatched.filter(v => v).length;
+            progress += (videosCompleted / 3) * 20;
+
+            // QCM : 30%
+            const qcmCompleted = state.qcmCorrect.filter(q => q).length;
+            progress += (qcmCompleted / 6) * 30;
+
+            // Cartes flip : 15%
+            const cardsCompleted = state.cardsFlipped.filter(c => c).length;
+            progress += (cardsCompleted / 6) * 15;
+
+            // Henderson : 17.5%
+            if (state.hendersonComplete) {
+                progress += 17.5;
+            }
+
+            // Maslow : 17.5%
+            if (state.maslowComplete) {
+                progress += 17.5;
+            }
+
+            // Mettre à jour la barre
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+        }
+
+        // Fonction pour générer un code unique de badge
+        function generateBadge() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR');
+            const timeStr = now.toLocaleTimeString('fr-FR');
+            
+            // Générer un identifiant unique
+            const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            
+            // Créer un hash simple basé sur la date, l'heure et l'ID
+            const dataToHash = dateStr + timeStr + randomId;
+            let hash = 0;
+            for (let i = 0; i < dataToHash.length; i++) {
+                const char = dataToHash.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            const hashStr = Math.abs(hash).toString(36).toUpperCase().substring(0, 8);
+            
+            // Format du code: MS-XXXXXXXX-HASH
+            const badgeCode = `MS-${randomId.substring(0, 8).toUpperCase()}-${hashStr}`;
+            
+            // Afficher les informations
+            document.getElementById('badgeCode').textContent = badgeCode;
+            document.getElementById('completionDate').textContent = dateStr;
+            document.getElementById('completionTime').textContent = timeStr;
+        }
+
+        // Fonction pour télécharger l'attestation
+        function downloadBadge() {
+            const badgeCode = document.getElementById('badgeCode').textContent;
+            const date = document.getElementById('completionDate').textContent;
+            const time = document.getElementById('completionTime').textContent;
+            
+            const attestation = `
+ATTESTATION DE FORMATION
+Formation Médico-Sociale
+
+Parcours complété avec succès le ${date} à ${time}
+
+Code de certification unique :
+${badgeCode}
+
+Ce code certifie que le détenteur a :
+- Visionné l'intégralité des contenus pédagogiques
+- Validé tous les quiz de compréhension
+- Découvert toutes les définitions clés
+- Maîtrisé les 14 besoins de Virginia Henderson
+- Complété la pyramide de Maslow
+- Validé le parcours de formation avec succès
+
+Code vérifiable auprès du formateur
+            `.trim();
+
+            const blob = new Blob([attestation], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Attestation_Formation_${badgeCode}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Initialisation
+        updateProgress();
+    </script>
+</body>
+</html>
